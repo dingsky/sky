@@ -494,3 +494,53 @@ void TransBcdToAsc(unsigned char *sStringInput, int inLen, char *sStringOutput)
 } 
 
 
+/*
+*函数名：StringReplace
+*功能：  将指定字符串中的某个子字符串替换为另一个字符串
+*入参：  sStringInput->输入字符串 sSourceStr->替换前字符串 sDestStr->替换后字符串 nBufSize->接收缓存大小
+*出参：  sStringOutput->输出字符串
+*说明:	 sStringInput需要足够的长度来保证替换后缓存不越界
+*返回值：>0 返回串的长度 -1 失败
+*/
+short StringReplace(char *sStringInput, char *sSourceStr, char *sDestStr, char *sStringOutput, int nBufSize)
+{
+    char * psTmp = NULL, char *psStart = NULL;
+    int nOffset, nCopySize, nDestStrLength;
+    
+    //参数合法性判断
+    if(sStringInput == NULL || sSourceStr == NULL || sDestStr == NULL) return;
+        
+    //循环处理
+    psStart = sStringInput;
+    nOffset = 0;
+    nDestStrLength = strlen(sDestStr);
+    while((psTmp = strstr(psStart,sSourceStr)) != NULL)
+    {
+        //拷贝被替换字符串前面的子串
+        nCopySize = psTmp - psStart;
+        if(nOffset+nCopySize >= nBufSize) return -1;
+        memcpy(sStringOutput+nOffset, psStart, nCopySize);
+        nOffset += nCopySize;
+        
+        //拷贝替换后字符串
+        if(nOffset + nDestStrLength >= nBufSize) return -1;
+        memcpy(sStringOutput+nOffset, sDestStr, nDestStrLength);  
+        
+        //下一次搜索起始位置移动到被替换子串的后面
+        psStart = psStart + nDestStrLength;                                                              
+    }  
+    
+    //拷贝最后不包含被替换字符串的子串
+    nCopySize = strlen(pStart);
+    if(nCopySize > 0)
+    {
+        if(nOffset+nCopySize >= nBufSize) return -1;
+        memcpy(sStringOutput+nOffset, psStart, nCopySize);
+        nOffset += nCopySize;
+    }  
+    
+    sStringOutput[nOffset] = 0;
+            
+    return nOffset;    
+}
+
